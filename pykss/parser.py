@@ -2,23 +2,19 @@ import os
 
 from pykss.comment import CommentParser
 from pykss.exceptions import SectionDoesNotExist
+from pykss.loaders import FileSystemLoader
 from pykss.section import Section
 
 
 class Parser(object):
 
     def __init__(self, *paths):
-        self.paths = paths
+        self.loader = FileSystemLoader(paths)
 
     def parse(self):
         sections = {}
 
-        filenames = [os.path.join(subpath, filename)
-            for path in self.paths
-            for subpath, dirs, files in os.walk(path)
-            for filename in files]
-
-        for filename in filenames:
+        for filename in self.loader.list_files():
             parser = CommentParser(filename)
             for block in parser.blocks:
                 section = Section(block, os.path.basename(filename))
