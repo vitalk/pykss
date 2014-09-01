@@ -15,7 +15,8 @@ class Parser(object):
         sections = {}
 
         for filename in self.loader.list_files():
-            parser = CommentParser(filename)
+            content, _ = self.loader.get_source(filename)
+            parser = CommentParser(content)
             for block in parser.blocks:
                 section = Section(block, os.path.basename(filename))
                 if section.section:

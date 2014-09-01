@@ -1,4 +1,3 @@
-import codecs
 import re
 
 
@@ -55,8 +54,8 @@ def normalize(lines):
 
 class CommentParser(object):
 
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self, text):
+        self.text = text
 
     def parse(self):
         blocks = []
@@ -64,39 +63,38 @@ class CommentParser(object):
         inside_single_line_block = False
         inside_multi_line_block = False
 
-        with codecs.open(self.filename, 'r', 'utf-8') as fileobj:
-            for line in fileobj:
-                # Parse single-line style
-                if is_single_line_comment(line):
-                    parsed = parse_single_line(line)
+        for line in self.text.splitlines():
+            # Parse single-line style
+            if is_single_line_comment(line):
+                parsed = parse_single_line(line)
 
-                    if inside_single_line_block:
-                        current_block.append(parsed)
-                    else:
-                        current_block = [parsed]
-                        inside_single_line_block = True
+                if inside_single_line_block:
+                    current_block.append(parsed)
+                else:
+                    current_block = [parsed]
+                    inside_single_line_block = True
 
-                # Prase multi-line style
-                if is_multi_line_comment_start(line) or inside_multi_line_block:
-                    parsed = parse_multi_line(line)
+            # Prase multi-line style
+            if is_multi_line_comment_start(line) or inside_multi_line_block:
+                parsed = parse_multi_line(line)
 
-                    if inside_multi_line_block:
-                        current_block.append(parsed)
-                    else:
-                        current_block = [parsed]
-                        inside_multi_line_block = True
+                if inside_multi_line_block:
+                    current_block.append(parsed)
+                else:
+                    current_block = [parsed]
+                    inside_multi_line_block = True
 
-                # End a multi-line block if detected
-                if is_multi_line_comment_end(line):
-                    inside_multi_line_block = False
+            # End a multi-line block if detected
+            if is_multi_line_comment_end(line):
+                inside_multi_line_block = False
 
-                # Store the current block if we're done
-                if is_single_line_comment(line) is False and inside_multi_line_block is False:
-                    if current_block:
-                        blocks.append(normalize(current_block))
+            # Store the current block if we're done
+            if is_single_line_comment(line) is False and inside_multi_line_block is False:
+                if current_block:
+                    blocks.append(normalize(current_block))
 
-                    inside_single_line_block = False
-                    current_block = []
+                inside_single_line_block = False
+                current_block = []
 
         return blocks
 

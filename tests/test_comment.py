@@ -30,7 +30,8 @@ class CommentMethodTestCase(unittest.TestCase):
 class CommentParserTestCase(unittest.TestCase):
 
     def setUp(self):
-        text = os.path.join(os.path.dirname(__file__), 'fixtures', 'comments.txt')
+        path = os.path.join(os.path.dirname(__file__), 'fixtures', 'comments.txt')
+        text = open(path).read().decode('utf-8')
         self.comments = comment.CommentParser(text).blocks
 
     def test_finds_single_line_comment_styles(self):
