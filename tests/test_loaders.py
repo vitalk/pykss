@@ -66,12 +66,12 @@ class LoaderTestCase(unittest.TestCase):
 
 class FileSystemLoaderTestCase(unittest.TestCase, TempdirHelper):
 
-    default_files = (
-        'foobar',
-        'foo/bar',
-        'foo/baz',
-        'bar/baz',
-    )
+    default_files = {
+        'foobar': 'foobar',
+        'foo/bar': 'foo/bar',
+        'foo/baz': 'foo/baz',
+        'bar/baz': 'bar/baz',
+    }
 
     def setUp(self):
         TempdirHelper.setUp(self)
@@ -87,3 +87,15 @@ class FileSystemLoaderTestCase(unittest.TestCase, TempdirHelper):
     def test_list_files(self):
         expected = sorted(map(self.path, self.default_files))
         self.assertEqual(self.loader.list_files(), expected)
+
+    def test_get_source_returns_empty_string_when_path_does_not_exists(self):
+        self.assertEqual(self.loader.get_source('???'), '')
+
+    def test_get_source_if_file_exists(self):
+        content, _ = self.loader.get_source(self.path('foo/bar'))
+        self.assertEqual(content, 'foo/bar')
+
+    def test_get_source_returns_reload_helper(self):
+        _, uptodate = self.loader.get_source(self.path('foobar'))
+        self.assertTrue(callable(uptodate))
+        self.assertTrue(uptodate())

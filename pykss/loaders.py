@@ -48,3 +48,32 @@ class FileSystemLoader(Loader):
                     if path not in found:
                         found.add(path)
         return sorted(found)
+
+    def get_source(self, path):
+        """Get the file content and reload helper as a ``(source, uptodate)``
+        tuple.
+
+        The first part of the returned tuple is file content as unicode
+        string. If file does not exist then empty string returned.
+
+        The last part is `uptodate` function. When autoreload is enabled
+        it's always called to check if the file content changed. If it returns
+        `False` the file will be reloaded.
+
+        :param path: The path to file.
+        """
+        if not os.path.exists(path):
+            return ''
+
+        with open(path, 'rb') as fileobj:
+            source = fileobj.read().decode('utf-8')
+
+        mtime = os.path.getmtime(path)
+
+        def uptodate():
+            try:
+                return os.path.getmtime(path) == mtime
+            except IOError:
+                return False
+
+        return source, uptodate
