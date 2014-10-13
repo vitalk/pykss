@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
+from codecs import open
 
 
 class Loader(object):
@@ -66,7 +67,7 @@ class FileSystemLoader(Loader):
             return ''
 
         with open(path, 'rb') as fileobj:
-            source = fileobj.read().decode('utf-8')
+            source = fileobj.read()
 
         mtime = os.path.getmtime(path)
 
